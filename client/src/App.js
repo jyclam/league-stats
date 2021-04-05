@@ -1,8 +1,10 @@
-import { useReducer } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
 import { matchReducer, initialState } from "./reducers/matchReducer";
+
+import MatchResult from "./components/MatchResult";
 
 const Main = styled.div`
   display: flex;
@@ -18,9 +20,9 @@ const Main = styled.div`
   }
 `;
 
-const MatchResult = ({ match }) => <div> {match.gameId}</div>;
-
 function App() {
+  const [staticData, setStaticData] = useState({});
+  const [matchState, dispatch] = useReducer(matchReducer, initialState);
   const {
     register,
     handleSubmit,
@@ -28,7 +30,32 @@ function App() {
     formState: { errors },
   } = useForm();
 
-  const [matchState, dispatch] = useReducer(matchReducer, initialState);
+  // refactor into useStaticData hook / useContext
+  useEffect(() => {
+    fetch("http://localhost:5000/static/queues.json")
+      .then((response) => response.json())
+      .then((data) =>
+        setStaticData((prevState) => ({ ...prevState, queuesData: data })),
+      );
+
+    fetch("http://localhost:5000/static/11.6.1/data/en_US/champion.json")
+      .then((response) => response.json())
+      .then((data) =>
+        setStaticData((prevState) => ({ ...prevState, championsData: data })),
+      );
+
+    fetch("http://localhost:5000/static/11.6.1/data/en_US/summoner.json")
+      .then((response) => response.json())
+      .then((data) =>
+        setStaticData((prevState) => ({ ...prevState, summonerData: data })),
+      );
+
+    fetch("http://localhost:5000/static/11.6.1/data/en_US/runesReforged.json")
+      .then((response) => response.json())
+      .then((data) =>
+        setStaticData((prevState) => ({ ...prevState, runesData: data })),
+      );
+  }, []);
 
   const onSubmit = (data) => {
     reset();
@@ -70,7 +97,11 @@ function App() {
       {matchState.matches.length === 0
         ? "No results"
         : matchState.matches.map((match) => (
-            <MatchResult key={match.gameId} match={match} />
+            <MatchResult
+              key={match.gameId}
+              match={match}
+              staticData={staticData}
+            />
           ))}
     </Main>
   );
