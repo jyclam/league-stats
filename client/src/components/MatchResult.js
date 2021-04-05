@@ -112,6 +112,14 @@ const MatchResult = ({ match, staticData }) => {
     match.stats.deaths
   ).toPrecision(4);
 
+  const creepScore =
+    match.stats.totalMinionsKilled + match.stats.neutralMinionsKilled;
+
+  const averageCreepScore = (
+    creepScore /
+    (match.gameDuration / 60)
+  ).toPrecision(2);
+
   return (
     <MatchDiv>
       <GameStats>
@@ -171,7 +179,10 @@ const MatchResult = ({ match, staticData }) => {
           <span className={"bold"}>KDA</span>
         </div>
       </PlayerStats>
-      <Container>3</Container>
+      <Container>
+        <div>{`Level${match.stats.champLevel}`}</div>
+        <div>{`${creepScore} (${averageCreepScore}) CS`}</div>
+      </Container>
       <Container>4</Container>
     </MatchDiv>
   );
