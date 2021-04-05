@@ -7,15 +7,11 @@ export const matchReducer = (state, action) => {
     };
   }
   if (action.type === "RESPONSE_COMPLETE") {
-    const sta = {
+    return {
       matches: action.payload.data,
       loading: false,
       error: null,
     };
-
-    console.log(sta);
-
-    return sta;
   }
   if (action.type === "ERROR") {
     return {
