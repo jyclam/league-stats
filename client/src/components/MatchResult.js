@@ -192,12 +192,14 @@ const MatchResult = ({ match, staticData }) => {
           match.stats.item4,
           match.stats.item5,
           match.stats.item6,
-        ].map((itemCode) => (
-          <SquareImg
-            key={itemCode}
-            src={`http://localhost:5000/static/11.6.1/img/item/${itemCode}.png`}
-          />
-        ))}
+        ]
+          .filter((itemCode) => itemCode !== 0)
+          .map((itemCode) => (
+            <SquareImg
+              key={itemCode}
+              src={`http://localhost:5000/static/11.6.1/img/item/${itemCode}.png`}
+            />
+          ))}
       </Container>
     </MatchDiv>
   );
