@@ -1,6 +1,7 @@
 export const matchReducer = (state, action) => {
   if (action.type === "FETCHING") {
     return {
+      firstLoad: false,
       matches: [],
       loading: true,
       error: null,
@@ -8,6 +9,7 @@ export const matchReducer = (state, action) => {
   }
   if (action.type === "RESPONSE_COMPLETE") {
     return {
+      firstLoad: false,
       matches: action.payload.data,
       loading: false,
       error: null,
@@ -15,6 +17,7 @@ export const matchReducer = (state, action) => {
   }
   if (action.type === "ERROR") {
     return {
+      firstLoad: false,
       matches: [],
       loading: false,
       error: action.payload.error,
@@ -24,6 +27,7 @@ export const matchReducer = (state, action) => {
 };
 
 export const initialState = {
+  firstLoad: true,
   matches: [],
   loading: false,
   error: null,

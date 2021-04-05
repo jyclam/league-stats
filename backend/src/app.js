@@ -15,7 +15,11 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/static", express.static("public"));
-app.use(logger("dev"));
+if (process.env.NODE_ENV === "production") {
+  app.use(logger("combined"));
+} else {
+  app.use(logger("dev"));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/summoner", summonerRouter);

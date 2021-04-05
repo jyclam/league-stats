@@ -1,10 +1,22 @@
 import styled from "styled-components";
+import * as dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+import { STATIC_ASSETS_URL } from "../constants/urls";
+
+dayjs.extend(relativeTime);
 
 const MatchDiv = styled.div`
-  border: black solid thin;
   display: flex;
   flex-flow: row nowrap;
   width: 100%;
+  max-width: 85rem;
+  min-height: 15rem;
+  background-color: #a3cfec;
+  border: #99b9cf solid 0.35rem;
+  padding: 2rem;
+  margin-bottom: 1rem;
+  color: #555555;
 
   .bold {
     font-weight: 700;
@@ -20,9 +32,21 @@ const GameStats = styled(Container)`
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 10rem;
+
+  div {
+    margin-bottom: 1rem;
+  }
 
   .victory {
     color: #1a78a2;
+  }
+
+  .bar {
+    background: #99b9cf;
+    width: 3rem;
+    height: 0.2rem;
+    margin: 0.5rem auto;
   }
 `;
 
@@ -31,6 +55,15 @@ const ChampionInfo = styled(Container)`
   flex-direction: column;
   align-content: center;
   justify-content: center;
+
+  div {
+    margin-bottom: 0.4rem;
+  }
+
+  .champName {
+    align-self: center;
+    font-weight: 500;
+  }
 `;
 
 const SummonerContainer = styled.div`
@@ -62,6 +95,19 @@ const PlayerStats = styled(Container)`
 
   .lightgray {
     color: #879292;
+  }
+`;
+
+const LevelContainer = styled(Container)`
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  margin-top: -1rem;
+  font-size: 2rem;
+  font-weight: 500;
+  color: #555e5e;
+  div {
+    margin-bottom: 1rem;
   }
 `;
 
@@ -123,10 +169,12 @@ const MatchResult = ({ match, staticData }) => {
   return (
     <MatchDiv>
       <GameStats>
-        <div>{cleanseGameModeName(queueObject.description)}</div>
-        <div>{match.gameCreation}</div>
-        <div />
-        <div className={`${match.stats.win && "victory"}`}>
+        <div className={"bold"}>
+          {cleanseGameModeName(queueObject.description)}
+        </div>
+        <div>{dayjs(match.gameCreation).fromNow()}</div>
+        <div className={"bar"} />
+        <div className={`${match.stats.win && "victory"} bold gameResult`}>
           {match.stats.win ? "Victory" : "Defeat"}
         </div>
         <div>{gameDurationInMinutesSeconds}</div>
@@ -134,13 +182,13 @@ const MatchResult = ({ match, staticData }) => {
       <ChampionInfo>
         <SummonerContainer>
           <HeroImg
-            src={`http://localhost:5000/static/11.6.1/img/champion/${champion.name}.png`}
+            src={`${STATIC_ASSETS_URL}/11.6.1/img/champion/${champion.name}.png`}
           />
           <div>
             {summonerSpells.map((spell) => (
               <SquareImg
                 key={spell.id}
-                src={`http://localhost:5000/static/11.6.1/img/spell/${spell.image.full}`}
+                src={`${STATIC_ASSETS_URL}/11.6.1/img/spell/${spell.image.full}`}
               />
             ))}
           </div>
@@ -149,12 +197,12 @@ const MatchResult = ({ match, staticData }) => {
               <RoundImg
                 key={rune.id}
                 className={"runes"}
-                src={`http://localhost:5000/static/img/${rune.icon}`}
+                src={`${STATIC_ASSETS_URL}/img/${rune.icon}`}
               />
             ))}
           </div>
         </SummonerContainer>
-        <div>{champion.name}</div>
+        <div className={"champName"}>{champion.name}</div>
       </ChampionInfo>
       <PlayerStats>
         <div className={"bold large"}>
@@ -179,10 +227,10 @@ const MatchResult = ({ match, staticData }) => {
           <span className={"bold"}>KDA</span>
         </div>
       </PlayerStats>
-      <Container>
+      <LevelContainer>
         <div>{`Level${match.stats.champLevel}`}</div>
         <div>{`${creepScore} (${averageCreepScore}) CS`}</div>
-      </Container>
+      </LevelContainer>
       <Container>
         {[
           match.stats.item0,
@@ -197,7 +245,7 @@ const MatchResult = ({ match, staticData }) => {
           .map((itemCode) => (
             <SquareImg
               key={itemCode}
-              src={`http://localhost:5000/static/11.6.1/img/item/${itemCode}.png`}
+              src={`${STATIC_ASSETS_URL}/11.6.1/img/item/${itemCode}.png`}
             />
           ))}
       </Container>
