@@ -14,6 +14,7 @@ app.use((req, res, next) => {
   );
   next();
 });
+app.use("/static", express.static("public"));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
