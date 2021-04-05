@@ -5,6 +5,10 @@ const MatchDiv = styled.div`
   display: flex;
   flex-flow: row nowrap;
   width: 100%;
+
+  .bold {
+    font-weight: 700;
+  }
 `;
 
 const Container = styled.div`
@@ -32,6 +36,33 @@ const ChampionInfo = styled(Container)`
 const SummonerContainer = styled.div`
   display: flex;
   flex-direction: row;
+`;
+
+const PlayerStats = styled(Container)`
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  font-size: 2rem;
+  color: #555e5e;
+
+  div {
+    margin-bottom: 1.5rem;
+  }
+
+  .large {
+    font-size: 3rem;
+  }
+  .red {
+    color: #c6443e;
+  }
+
+  .darkgray {
+    color: #353a3a;
+  }
+
+  .lightgray {
+    color: #879292;
+  }
 `;
 
 const HeroImg = styled.img`
@@ -72,14 +103,14 @@ const MatchResult = ({ match, staticData }) => {
       parseInt(summonerInfo.key) === match.spell2Id,
   );
 
-  console.log({ summonerSpells });
-  console.log(match.spell1Id);
-  console.log(match.spell2Id);
-  console.log(summonerData);
-
   const runes = [match.stats.perk0, match.stats.perkSubStyle].flatMap((rune) =>
     findRuneObject(runesData, rune),
   );
+
+  const killsAssistsPerDeath = (
+    (match.stats.kills + match.stats.assists) /
+    match.stats.deaths
+  ).toPrecision(4);
 
   return (
     <MatchDiv>
@@ -117,7 +148,29 @@ const MatchResult = ({ match, staticData }) => {
         </SummonerContainer>
         <div>{champion.name}</div>
       </ChampionInfo>
-      <Container>2</Container>
+      <PlayerStats>
+        <div className={"bold large"}>
+          <span className={"gray"}>{match.stats.kills} </span>{" "}
+          <span className={"lightgray"}> / </span>{" "}
+          <span className={"red"}>{match.stats.deaths}</span>
+          <span className={"lightgray"}> / </span> {match.stats.assists}
+        </div>
+        <div>
+          {killsAssistsPerDeath === Infinity ||
+          killsAssistsPerDeath === "Infinity" ? ( // toPrecision on Infinity converts it to a string
+            <>
+              <span className={"darkgray bold"}>Perfect</span>
+            </>
+          ) : (
+            <>
+              <span
+                className={"darkgray bold"}
+              >{`${killsAssistsPerDeath}:1`}</span>{" "}
+            </>
+          )}{" "}
+          <span className={"bold"}>KDA</span>
+        </div>
+      </PlayerStats>
       <Container>3</Container>
       <Container>4</Container>
     </MatchDiv>
