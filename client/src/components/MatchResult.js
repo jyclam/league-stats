@@ -183,7 +183,22 @@ const MatchResult = ({ match, staticData }) => {
         <div>{`Level${match.stats.champLevel}`}</div>
         <div>{`${creepScore} (${averageCreepScore}) CS`}</div>
       </Container>
-      <Container>4</Container>
+      <Container>
+        {[
+          match.stats.item0,
+          match.stats.item1,
+          match.stats.item2,
+          match.stats.item3,
+          match.stats.item4,
+          match.stats.item5,
+          match.stats.item6,
+        ].map((itemCode) => (
+          <SquareImg
+            key={itemCode}
+            src={`http://localhost:5000/static/11.6.1/img/item/${itemCode}.png`}
+          />
+        ))}
+      </Container>
     </MatchDiv>
   );
 };
