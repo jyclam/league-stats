@@ -126,7 +126,7 @@ const SquareImg = styled.img`
   margin-right: 0.3rem;
 `;
 
-const RoundImg = styled(SquareImg)`
+const RuneIcon = styled(SquareImg)`
   border-radius: 50%;
 `;
 
@@ -139,7 +139,7 @@ const MatchResult = ({ match, staticData }) => {
     match.gameDuration / 60,
   )}m ${match.gameDuration % 60}s`;
 
-  const [champion] = Object.values(championsData.data).filter(
+  const champion = Object.values(championsData.data).find(
     (championInfo) => parseInt(championInfo.key) === match.championId,
   );
 
@@ -194,7 +194,7 @@ const MatchResult = ({ match, staticData }) => {
           </div>
           <div>
             {runes.map((rune) => (
-              <RoundImg
+              <RuneIcon
                 key={rune.id}
                 className={"runes"}
                 src={`${STATIC_ASSETS_URL}/img/${rune.icon}`}

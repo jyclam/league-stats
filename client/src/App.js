@@ -1,10 +1,11 @@
-import { useState, useEffect, useReducer } from "react";
+import { useState, useReducer } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
-import { matchReducer, initialState } from "./reducers/matchReducer";
+import { uiReducer, initialState } from "./reducers/uiReducer";
 import MatchResult from "./components/MatchResult";
-import { STATIC_ASSETS_URL, API_ENDPOINT_URL } from "./constants/urls";
+import { API_ENDPOINT_URL } from "./constants/urls";
+import useStaticData from "./hooks/useStaticData";
 
 const Main = styled.div`
   display: flex;
@@ -24,6 +25,17 @@ const Main = styled.div`
     color: #ba1a4b;
   }
   .loader {
+    font-size: 5rem;
+    animation: blinker 1s linear infinite;
+  }
+
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .noResults {
     font-size: 5rem;
   }
 `;
@@ -48,8 +60,8 @@ const Input = styled.input`
 `;
 
 function App() {
-  const [staticData, setStaticData] = useState({});
-  const [matchState, dispatch] = useReducer(matchReducer, initialState);
+  const [matches, setMatches] = useState([]);
+  const [uiState, dispatch] = useReducer(uiReducer, initialState);
   const {
     register,
     handleSubmit,
@@ -57,42 +69,12 @@ function App() {
     formState: { errors },
   } = useForm();
 
-  // refactor into useStaticData hook / useContext
-  useEffect(() => {
-    // convert to async and handle errors in one try / catch
-    fetch(`${STATIC_ASSETS_URL}/queues.json`)
-      .then((response) => response.json())
-      .then((data) =>
-        setStaticData((prevState) => ({ ...prevState, queuesData: data })),
-      )
-      .catch((error) => console.error(error));
-
-    fetch(`${STATIC_ASSETS_URL}/11.6.1/data/en_US/champion.json`)
-      .then((response) => response.json())
-      .then((data) =>
-        setStaticData((prevState) => ({ ...prevState, championsData: data })),
-      )
-      .catch((error) => console.error(error));
-
-    fetch(`${STATIC_ASSETS_URL}/11.6.1/data/en_US/summoner.json`)
-      .then((response) => response.json())
-      .then((data) =>
-        setStaticData((prevState) => ({ ...prevState, summonerData: data })),
-      )
-      .catch((error) => console.error(error));
-
-    fetch(`${STATIC_ASSETS_URL}/11.6.1/data/en_US/runesReforged.json`)
-      .then((response) => response.json())
-      .then((data) =>
-        setStaticData((prevState) => ({ ...prevState, runesData: data })),
-      )
-      .catch((error) => console.error(error));
-  }, []);
+  const staticData = useStaticData();
 
   const onSubmit = (data) => {
     reset();
 
-    dispatch({ type: "FETCHING" });
+    dispatch({ type: "LOADING" });
     fetch(API_ENDPOINT_URL, {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       method: "post",
@@ -100,7 +82,8 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        dispatch({ type: "RESPONSE_COMPLETE", payload: { data } });
+        setMatches(data);
+        dispatch({ type: "READY" });
       })
       .catch((error) => {
         if (error.statusCode === 504) {
@@ -126,18 +109,20 @@ function App() {
           {...register("summonerName", { required: true })}
         />
       </form>
-      {matchState.loading && <span className={"loader"}>Fetching data!</span>}
-      {!matchState.firstLoad &&
-      !matchState.loading &&
-      matchState.matches.length === 0
-        ? "No results"
-        : matchState.matches.map((match) => (
+      {uiState.loading && <span className="loader">Fetching data!</span>}
+
+      {uiState.ready &&
+        (matches.length === 0 ? (
+          <span className="noResults">No results</span>
+        ) : (
+          matches.map((match) => (
             <MatchResult
               key={match.gameId}
               match={match}
               staticData={staticData}
             />
-          ))}
+          ))
+        ))}
     </Main>
   );
 }
